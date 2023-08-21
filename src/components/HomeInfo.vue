@@ -21,15 +21,22 @@
                 <span>创建时间 {{ createdAt }}</span>
             </div>
         </div>
+
+        <div class="bottom bx">
+            <span>{{ oneWord }}</span><span @click="reloadWord" class="reloadWord">点击换一条</span>
+        </div>
     </div>
 </template>
 
 <script>
 
+import axios from 'axios'
+
 export default {
     name: 'HomeInfo',
     data() {
         return {
+            oneWord: '',
             fullName: '',
             htmlUrl: '',
             size: '',
@@ -40,6 +47,17 @@ export default {
         }
     },
     methods: {
+
+        // 一言
+        reloadWord() {
+            axios.get(`https://api.oick.cn/yiyan/api.php`)
+                .then(res => {
+                    this.oneWord = res.data
+                })
+                .catch(err => {
+                    console.error(err);
+                })
+        },
 
         // 仓库最大1GB=1024MB=1048576KB
         // size的单位就是KB
@@ -68,10 +86,7 @@ export default {
     // 接收数据
     mounted() {
 
-        // if (localStorage.getItem('allData') == '') {
-        //     console.log("是")
-        //     this.$router.push('/')
-        // }
+        this.msg = this.reloadWord()
 
         let data = JSON.parse(localStorage.getItem('allData'))
 
@@ -94,6 +109,18 @@ export default {
 </script>
 
 <style scoped>
+
+.reloadWord{
+    color: green;
+    cursor: pointer;
+}
+
+.bottom{
+    padding-top: 100px;
+    font-size: 30px;
+    text-align: center;
+}
+
 .dateInfo {
     display: flex;
     flex-direction: column;

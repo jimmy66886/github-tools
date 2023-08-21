@@ -3,10 +3,13 @@
         <div class="title">
             <h1>{{ msg }}</h1>
         </div>
+        <div class="dogDaily">
+            <span>{{ dogSays }}</span>&nbsp;&nbsp;<span @click="reloadDog" class="reloadDog">点击换一条</span>
+        </div>
         <div class="info">
             <div class="inputs">
-                <input type="text" placeholder="账户名" v-model="user" /><br>
-                <input placeholder="仓库名" v-model="repo" />
+                <input type="text" placeholder=" 账户名" v-model="user" /><br><br>
+                <input placeholder=" 仓库名" v-model="repo" />
             </div>
             <v-spin :spinning="spinning" size="large" tip="加载中"></v-spin>
             <v-button @click="enter">点击查询</v-button>
@@ -25,10 +28,22 @@ export default {
             allData: {},// 返回结果集
             user: '',
             repo: '',
-            spinning: false
+            spinning: false,
+            dogSays: '',
         }
     },
     methods: {
+
+        reloadDog() {
+            axios.get(`https://api.oick.cn/dog/api.php`)
+                .then(res => {
+                    this.dogSays = res.data
+                })
+                .catch(err => {
+                    console.error(err);
+                })
+        },
+
         enter() {
             if (this.user == '' || this.repo == '') {
                 this.$message.info('请输入内容', 2)
@@ -59,6 +74,9 @@ export default {
         },
 
     },
+    mounted() {
+        this.reloadDog()
+    },
     beforeDestroy() {
         localStorage.setItem('allData', JSON.stringify(this.allData))
     },
@@ -66,6 +84,19 @@ export default {
 </script>
 
 <style scoped>
+.reloadDog {
+    color: green;
+    cursor: pointer;
+}
+
+.dogDaily {
+    font-style: italic;
+    font-size: 20px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    text-align: center;
+}
+
 .title {
     text-align: center;
     font-size: 30px;
@@ -85,7 +116,7 @@ export default {
 .info button {
     margin-left: 100px;
     width: 160px;
-    height: 160px;
+    height: 180px;
     border-radius: 20px;
     font-size: 25px;
 }
