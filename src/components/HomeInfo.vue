@@ -113,9 +113,9 @@ export default {
 .nowSize {
     height: 60px;
     border-radius: 8px;
-    background-color: skyblue;
+    background-color: rgb(173, 216, 233);
     line-height: 60px;
-    color: aliceblue;
+    color: black;
     transition: all 1s;
 }
 

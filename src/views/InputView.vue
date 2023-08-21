@@ -30,10 +30,12 @@ export default {
     },
     methods: {
         enter() {
-            this.spinning = true
             if (this.user == '' || this.repo == '') {
+                this.$message.info('请输入内容', 2)
                 return
             }
+            this.spinning = true
+
             // 输入不为空,给接口发请求:`https://api.github.com/repos/user/repo`
             axios.get(`https://api.github.com/repos/${this.user}/${this.repo}`)
                 .then(res => {
@@ -47,7 +49,11 @@ export default {
                     this.$router.push('/homeInfo')
                 })
                 .catch(err => {
-                    console.error(err);
+                    if (err.message == 'Request failed with status code 404') {
+                        // 关闭加载动画
+                        this.spinning = false
+                        this.$message.info('没有该仓库,请检查输入!', 2)
+                    }
                 })
 
         },
