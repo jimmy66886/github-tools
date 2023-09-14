@@ -9,13 +9,7 @@
         </div>
 
         <div class="repoInfo bx">
-            <div class="info_left">
-                <span class="intro">仓库容量使用情况</span>
-                <div class="maxSize">
-                    <div class="nowSize" :style="{ width: showSize + '%' }"><span>{{ showSize + '%' }}</span>
-                    </div>
-                </div>
-            </div>
+            
             <div class="dateInfo">
                 <span>更新时间 {{ pushedAt }}</span>
                 <span>创建时间 {{ createdAt }}</span>
@@ -25,12 +19,16 @@
         <div class="bottom bx">
             <span>{{ oneWord }}</span><span @click="reloadWord" class="reloadWord">点击换一条</span>
         </div>
+
+        <div class="echart" id="mychart" :style="{ float: 'left', width: '100%', height: '400px' }"></div>
+
     </div>
 </template>
 
 <script>
 
 import axios from 'axios'
+import * as echarts from "echarts"
 
 export default {
     name: 'HomeInfo',
@@ -43,10 +41,50 @@ export default {
             avatar: '',
             pushedAt: '',
             createdAt: '',
-            showSize: 0
+            showSize: 0,
         }
     },
     methods: {
+
+        initEcharts() {
+            const option = {
+                title: {
+                    text: '仓库使用情况',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                },
+                series: [
+                    {
+                        name: 'Access From',
+                        type: 'pie',
+                        radius: '50%',
+                        data: [
+                            { value: this.size, name: '已使用' },
+                            { value: 1048567, name: '总空间' },
+                        ],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            const myChart = echarts.init(document.getElementById("mychart"));// 图标初始化
+            myChart.setOption(option);// 渲染页面
+            //随着屏幕大小调节图表
+            window.addEventListener("resize", () => {
+                myChart.resize();
+            });
+        },
 
         // 一言
         reloadWord() {
@@ -80,11 +118,12 @@ export default {
 
             this.shanghaiTime = `${year}/${month}/${day} ${hours}:${minutes}`;
             return this.shanghaiTime
-        }
+        },
 
     },
     // 接收数据
     mounted() {
+
 
         this.msg = this.reloadWord()
 
@@ -101,6 +140,9 @@ export default {
         setTimeout(() => {
             this.showSize = ((this.size / 1048567) * 100).toFixed(2)
         }, 500);
+
+        this.initEcharts();
+
     },
     beforeDestroy() {
         localStorage.removeItem('allData')
@@ -109,13 +151,12 @@ export default {
 </script>
 
 <style scoped>
-
-.reloadWord{
+.reloadWord {
     color: green;
     cursor: pointer;
 }
 
-.bottom{
+.bottom {
     padding-top: 100px;
     font-size: 30px;
     text-align: center;
